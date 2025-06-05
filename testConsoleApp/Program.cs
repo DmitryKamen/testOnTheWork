@@ -7,11 +7,12 @@ namespace testConsoleApp
 
     class Program
     {
-        static string connectionString = @"Server=DESKTOP-PF5QIJD;Database=DatabaseTest;User Id=user1;Password=sa;";
+        static string connectionString = @"Server=DESKTOP-PF5QIJD;Database=DatabaseTest;User Id=user1;
+        Password=sa;TrustServerCertificate=True;";
 
         static void Main()
         {
-            string filePath = "clients.xlsx";
+            string filePath = "C:\\Users\\piton\\OneDrive\\Documents\\List.xlsx";
 
             var clients = ReadClientsFromExcel(filePath);
             InsertClientsToDatabase(clients);
@@ -82,29 +83,69 @@ namespace testConsoleApp
 
                 foreach (var client in clients)
                 {
-                    using (var command = new SqlCommand(@"
+                    var checkCommand = new SqlCommand("SELECT COUNT(*) FROM Clients WHERE CardCode = @CardCode", connection);
+                    checkCommand.Parameters.AddWithValue("@CardCode", client.CardCode);
+
+                    int count = (int)checkCommand.ExecuteScalar();
+
+                    if (count == 0)
+                    {
+                        var insertCommand = new SqlCommand(@"
                     INSERT INTO Clients 
                     (CardCode, LastName, FirstName, SurName, PhoneMobile, Email, GenderId, Birthday, City, Pincode, Bonus, Turrover)
                     VALUES
-                    (@CardCode, @LastName, @FirstName, @SurName, @PhoneMobile, @Email, @GenderId, @Birthday, @City, @Pincode, @Bonus, @Turrover)", connection))
-                    {
-                        command.Parameters.AddWithValue("@CardCode", client.CardCode);
-                        command.Parameters.AddWithValue("@LastName", (object)client.LastName ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@FirstName", (object)client.FirstName ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@SurName", (object)client.SurName ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@PhoneMobile", (object)client.PhoneMobile ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Email", (object)client.Email ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@GenderId", (object)client.GenderId ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Birthday", (object)client.Birthday ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@City", (object)client.City ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Pincode", (object)client.Pincode ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Bonus", (object)client.Bonus ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Turrover", (object)client.Turrover ?? DBNull.Value);
+                    (@CardCode, @LastName, @FirstName, @SurName, @PhoneMobile, @Email, @GenderId, @Birthday, @City, @Pincode, @Bonus, @Turrover)", connection);
 
-                        command.ExecuteNonQuery();
+                        insertCommand.Parameters.AddWithValue("@CardCode", client.CardCode);
+                        insertCommand.Parameters.AddWithValue("@LastName", (object)client.LastName ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@FirstName", (object)client.FirstName ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@SurName", (object)client.SurName ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@PhoneMobile", (object)client.PhoneMobile ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@Email", (object)client.Email ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@GenderId", (object)client.GenderId ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@Birthday", (object)client.Birthday ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@City", (object)client.City ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@Pincode", (object)client.Pincode ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@Bonus", (object)client.Bonus ?? DBNull.Value);
+                        insertCommand.Parameters.AddWithValue("@Turrover", (object)client.Turrover ?? DBNull.Value);
+
+                        insertCommand.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        var updateCommand = new SqlCommand(@"
+                    UPDATE Clients SET 
+                        LastName = @LastName,
+                        FirstName = @FirstName,
+                        SurName = @SurName,
+                        PhoneMobile = @PhoneMobile,
+                        Email = @Email,
+                        GenderId = @GenderId,
+                        Birthday = @Birthday,
+                        City = @City,
+                        Pincode = @Pincode,
+                        Bonus = @Bonus,
+                        Turrover = @Turrover
+                    WHERE CardCode = @CardCode", connection);
+
+                        updateCommand.Parameters.AddWithValue("@CardCode", client.CardCode);
+                        updateCommand.Parameters.AddWithValue("@LastName", (object)client.LastName ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@FirstName", (object)client.FirstName ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@SurName", (object)client.SurName ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@PhoneMobile", (object)client.PhoneMobile ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@Email", (object)client.Email ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@GenderId", (object)client.GenderId ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@Birthday", (object)client.Birthday ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@City", (object)client.City ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@Pincode", (object)client.Pincode ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@Bonus", (object)client.Bonus ?? DBNull.Value);
+                        updateCommand.Parameters.AddWithValue("@Turrover", (object)client.Turrover ?? DBNull.Value);
+
+                        updateCommand.ExecuteNonQuery();
                     }
                 }
             }
         }
+
     }
 }

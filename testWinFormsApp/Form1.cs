@@ -5,7 +5,8 @@ namespace testWinFormsApp
 {
     public partial class Form1 : Form
     {
-        string connectionString = @"Server=DESKTOP-PF5QIJD;Database=DatabaseTest;User Id=user1;Password=sa;";
+        string connectionString = @"Server=DESKTOP-PF5QIJD;Database=DatabaseTest;
+        User Id=user1;Password=sa;TrustServerCertificate=True";
         DataTable clientsTable = new DataTable();
 
         public Form1()
